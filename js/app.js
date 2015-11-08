@@ -1,148 +1,174 @@
 
 /* ======= Model ======= */
-
 var model = {
-    currentCat: null,
-    cats: [
+    currentOption: null,
+    options: [
         {
-            clickCount : 0,
-            name : 'Tabby',
-            imgSrc : 'img/434164568_fea0ad4013_z.jpg',
-            imgAttribution : 'https://www.flickr.com/photos/bigtallguy/434164568'
+            clickCount: 0,
+            name: 'Tabby',
+            imgSrc: 'img/434164568_fea0ad4013_z.jpg',
+            imgAlt: 'Tabby'
         },
         {
-            clickCount : 0,
-            name : 'Tiger',
-            imgSrc : 'img/4154543904_6e2428c421_z.jpg',
-            imgAttribution : 'https://www.flickr.com/photos/xshamx/4154543904'
+            clickCount: 0,
+            name: 'Scaredy',
+            imgSrc: 'img/22252709_010df3379e_z.jpg',
+            imgAlt: 'Scaredy'
         },
         {
-            clickCount : 0,
-            name : 'Scaredy',
-            imgSrc : 'img/22252709_010df3379e_z.jpg',
-            imgAttribution : 'https://www.flickr.com/photos/kpjas/22252709'
+            clickCount: 0,
+            name: 'Tiger',
+            imgSrc: 'img/4154543904_6e2428c421_z.jpg',
+            imgAlt: 'Tiger'
         },
         {
-            clickCount : 0,
-            name : 'Shadow',
-            imgSrc : 'img/1413379559_412a540d29_z.jpg',
-            imgAttribution : 'https://www.flickr.com/photos/malfet/1413379559'
+            clickCount: 0,
+            name: 'Shadow',
+            imgSrc: 'img/1413379559_412a540d29_z.jpg',
+            imgAlt: 'Shadow'
         },
         {
-            clickCount : 0,
-            name : 'Sleepy',
-            imgSrc : 'img/9648464288_2516b35537_z.jpg',
-            imgAttribution : 'https://www.flickr.com/photos/onesharp/9648464288'
+            clickCount: 0,
+            name: 'Sleepy',
+            imgSrc: 'img/9648464288_2516b35537_z.jpg',
+            imgAlt: 'Sleepy'
         }
     ]
 };
 
 
-/* ======= Octopus ======= */
-
-var octopus = {
-
-    init: function() {
-        // set our current cat to the first one in the list
-        model.currentCat = model.cats[0];
-
-        // tell our views to initialize
-        catListView.init();
-        catView.init();
+/* ======= Controller ======= */
+var controller = {
+    
+    init: function () {
+        model.currentOption = model.options[0];
+        
+        optionView.init();
+        optionListView.init();
+        adminView.init();
     },
-
-    getCurrentCat: function() {
-        return model.currentCat;
+    
+    getCurrentOption: function () {
+        return model.currentOption;
     },
-
-    getCats: function() {
-        return model.cats;
+    
+    getOptions: function () {
+        return model.options;
     },
-
-    // set the currently-selected cat to the object passed in
-    setCurrentCat: function(cat) {
-        model.currentCat = cat;
+    
+    setCurrentOption: function (option) {
+        model.currentOption = option;
     },
-
-    // increments the counter for the currently-selected cat
-    incrementCounter: function() {
-        model.currentCat.clickCount++;
-        catView.render();
+    
+    incrementCounter: function () {
+        model.currentOption.clickCount++;
+        optionView.render();
+    },
+    
+    setNewValues: function (values) {
+        model.currentOption.clickCount = values.newCount;
+        model.currentOption.name = values.newName;
+        model.currentOption.imgSrc = values.newUrl;
+        model.currentOption.imgAlt = values.newName;
+        
+        optionView.render();
     }
-};
+}
 
 
 /* ======= View ======= */
-
-var catView = {
-
-    init: function() {
-        // store pointers to our DOM elements for easy access later
-        this.catElem = document.getElementById('cat');
-        this.catNameElem = document.getElementById('cat-name');
-        this.catImageElem = document.getElementById('cat-img');
-        this.countElem = document.getElementById('cat-count');
-
-        // on click, increment the current cat's counter
-        this.catImageElem.addEventListener('click', function(){
-            octopus.incrementCounter();
+var optionView = {
+    
+    init: function () {
+        this.optionWrap = document.querySelector('.selectedOption');
+        this.optionName = this.optionWrap.querySelector('.name');
+        this.optionImg = this.optionWrap.querySelector('img');
+        this.optionClickCount = this.optionWrap.querySelector('.count');
+        
+        this.optionImg.addEventListener('click', function () {
+            controller.incrementCounter(); 
         });
-
-        // render this view (update the DOM elements with the right values)
+        
         this.render();
     },
-
-    render: function() {
-        // update the DOM elements with values from the current cat
-        var currentCat = octopus.getCurrentCat();
-        this.countElem.textContent = currentCat.clickCount;
-        this.catNameElem.textContent = currentCat.name;
-        this.catImageElem.src = currentCat.imgSrc;
+    
+    render: function () {
+        var currentOption = controller.getCurrentOption();
+        this.optionName.textContent = currentOption.name;
+        this.optionImg.src = currentOption.imgSrc;
+        this.optionImg.alt = currentOption.imgAlt;
+        this.optionClickCount.textContent = currentOption.clickCount;
     }
 };
 
-var catListView = {
-
-    init: function() {
-        // store the DOM element for easy access later
-        this.catListElem = document.getElementById('cat-list');
-
-        // render this view (update the DOM elements with the right values)
+var optionListView = {
+    
+    init: function () {
+        this.optionListWrap = document.querySelector('.list');
+        
         this.render();
     },
-
-    render: function() {
-        var cat, elem, i;
-        // get the cats we'll be rendering from the octopus
-        var cats = octopus.getCats();
-
-        // empty the cat list
-        this.catListElem.innerHTML = '';
-
-        // loop over the cats
-        for (i = 0; i < cats.length; i++) {
-            // this is the cat we're currently looping over
-            cat = cats[i];
-
-            // make a new cat list item and set its text
-            elem = document.createElement('li');
-            elem.textContent = cat.name;
-
-            // on click, setCurrentCat and render the catView
-            // (this uses our closure-in-a-loop trick to connect the value
-            //  of the cat variable to the click event function)
-            elem.addEventListener('click', (function(catCopy) {
-                return function() {
-                    octopus.setCurrentCat(catCopy);
-                    catView.render();
+    
+    render: function () {
+        var option, listItem, i,
+            options = controller.getOptions();
+        
+        for (i = 0; i < options.length; i++) {
+            option = options[i];
+            listItem = document.createElement('li');
+            listItem.textContent = option.name;
+            
+            listItem.addEventListener('click', (function(optionCopy) {
+                return function () {
+                    controller.setCurrentOption(optionCopy);
+                    optionView.render();
                 };
-            })(cat));
-
-            // finally, add the element to the list
-            this.catListElem.appendChild(elem);
+            })(option));
+            
+            this.optionListWrap.appendChild(listItem);
         }
     }
 };
 
-// make it go!
-octopus.init();
+var adminView = {
+    
+    init: function () {
+        this.adminWrap = document.querySelector('.admin-area'); 
+        var adminMenu = this.adminWrap.querySelector('.admin-menu'),
+            inputName = this.adminWrap.querySelector('.input-name'),
+            inputUrl = this.adminWrap.querySelector('.input-url'),
+            inputCount = this.adminWrap.querySelector('.input-count');
+        this.btnToggle = this.adminWrap.querySelector('.admin-toggle');
+        this.btnCancel = this.adminWrap.querySelector('.admin-cancel');
+        this.btnSave = this.adminWrap.querySelector('.admin-save');
+        
+        var clearFields = function () {
+            inputName.value = '';
+            inputUrl.value = '';
+            inputCount.value = '';
+        };
+        
+        this.btnToggle.addEventListener('click', function () {
+            adminMenu.classList.toggle('hidden');
+            clearFields();
+        });
+        
+        this.btnCancel.addEventListener('click', function () {
+            adminMenu.classList.toggle('hidden');
+            clearFields();
+        });
+        
+        this.btnSave.addEventListener('click', function () {
+            var values = {
+                newName: document.querySelector('.input-name').value, 
+                newUrl: document.querySelector('.input-url').value, 
+                newCount: document.querySelector('.input-count').value
+            };
+            controller.setNewValues(values); 
+            adminMenu.classList.toggle('hidden');
+            clearFields();
+        });
+    }
+}
+
+controller.init();
